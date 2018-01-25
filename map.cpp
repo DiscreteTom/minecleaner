@@ -51,6 +51,10 @@ Map::Map(int width, int height, int bomb){
 		--bomb;
 		int x = rand() % m_width;
 		int y = rand() % m_height;
+		while (m_cubes[y][x].data == -1){
+			x = rand() % m_width;
+			y = rand() % m_height;
+		}
 		m_cubes[y][x].data = -1;
 
 		//nearby cubes data+1 if not bomb
@@ -127,19 +131,21 @@ bool Map::open(){
 		//bomb
 		return 0;
 	}
-	if (m_cubes[m_y][m_x].data == 0){
+	// if (m_cubes[m_y][m_x].data == 0){
 		for (int i = -1; i < 2; ++i){
 			for (int j = -1; j < 2; ++j){
 				if (m_x + i >= 0 && m_x + i < m_width && m_y + j >= 0 && m_y + j < m_height && !m_cubes[m_y + j][m_x + i].visible){
-					m_x += i;
-					m_y += j;
-					open();
-					m_x -= i;
-					m_y -= j;
+					if (!m_cubes[m_y + j][m_x + i].data || !m_cubes[m_y][m_x].data){
+						m_x += i;
+						m_y += j;
+						open();
+						m_x -= i;
+						m_y -= j;
+					}
 				}
 			}
 		}
-	}
+	// }
 	return 1;
 }//open
 void Map::show() const {

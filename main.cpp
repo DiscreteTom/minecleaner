@@ -12,22 +12,30 @@ void set(int & height, int & width, int & bomb);
 int main() {
 	SIGNAL sig = start();
 	int height, width, bomb;
+	bool replay = 0;
+	bool back = 0;
+
 	while (sig != EXIT){
-		if (sig == SET){
-			set(height, width, bomb);
-		} else {
-			height = width = bomb = 10;
+		if (!replay){
+			if (sig == SET){
+				set(height, width, bomb);
+			} else {
+				height = width = bomb = 10;
+			}
 		}
 
 		Map map = Map(width, height, bomb);
 		bool died = 0;
+		replay = back = 0;
 
-		while (!map.win() && !died){
+		while (!map.win() && !died && !replay && !back){
 			system("cls");
 			map.show();
 			cout << "\nPress WASD to move\n"
 			     << "Press J to open a block\n"
-					 << "Press K to set a flag\n";
+					 << "Press K to set a flag\n"
+					 << "Press R to replay\n"
+					 << "Press Q to return to menu\n";
 			char x = getch();
 			switch (x){
 				case 'W':
@@ -56,18 +64,43 @@ int main() {
 				case 'k':
 					map.setFlag();
 					break;
+				case 'R':
+				case 'r':
+					replay = 1;
+					break;
+				case 'Q':
+				case 'q':
+					back = 1;
+					break;
 			}
 		}
 
-		map.showAll();
-		if (died){
-			cout << "YOU DIED!!!\n";
-		} else {
-			cout << "YOU WIN !!!\n";
+		if (!replay && !back){
+			map.showAll();
+			if (died){
+				cout << "YOU DIED!!!\n";
+			} else {
+				cout << "YOU WIN !!!\n";
+			}
+			cout << "Press Q to return to menu\n"
+			     << "Press R to replay\n";
+			char x = 0;
+			while (x != 'Q' && x != 'q' && x != 'r' && x != 'R'){
+				x = getch();
+			}
+			switch (x){
+				case 'Q':
+				case 'q':
+					back = 1;
+					break;
+				case 'R':
+				case 'r':
+				 replay = 1;
+				 break;
+			}
 		}
-
-		system("pause");
-		sig = start();
+		if (!replay)
+			sig = start();
 	}
 	return 0;
 }
